@@ -1,0 +1,7 @@
+id,title,authors,average_rating,language_code,num_pages,ratings_count,text_reviews_count,publication_date,publisher
+1,Harry Potter and the Half-Blood Prince,J.K. Rowling,4.57,eng,652,2095690,27591,9/16/2006,Scholastic Inc.
+2,The Hitchhiker's Guide to the Galaxy,Douglas Adams,4.2,eng,215,4130,234,9/25/2007,Del Rey Books
+3,Dune,Frank Herbert,4.25,eng,688,1000000,15000,8/2/2005,Ace
+4,Pride and Prejudice,Jane Austen,4.28,eng,279,3500000,60000,1/28/2003,Penguin Classics
+5,The Hobbit,J.R.R. Tolkien,4.27,eng,310,3200000,50000,9/21/2002,Houghton Mifflin
+6,Don Quijote,Miguel de Cervantes,3.9,spa,1056,98000,2500,4/24/2004,Alfaguara
