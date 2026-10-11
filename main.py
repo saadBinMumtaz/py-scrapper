@@ -22,6 +22,7 @@ class MainWindow(QMainWindow):
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.cellClicked.connect(self.on_row_clicked)
 
         # ----- form (one text box per column, except id) -----
         self.inputs = {}
@@ -86,6 +87,11 @@ class MainWindow(QMainWindow):
         save_rows(self.rows)
         self.refresh_table()
         self.clear_form()
+        
+    def on_row_clicked(self, row, _col):                 # READ (show in form)
+        self.selected_index = row
+        for name, box in self.inputs.items():
+            box.setText(str(self.rows[row][name]))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
