@@ -5,3 +5,4 @@ id,title,authors,average_rating,language_code,num_pages,ratings_count,text_revie
 4,Pride and Prejudice,Jane Austen,4.28,eng,279,3500000,60000,1/28/2003,Penguin Classics
 5,The Hobbit,J.R.R. Tolkien,4.27,eng,310,3200000,50000,9/21/2002,Houghton Mifflin
 6,Don Quijote,Miguel de Cervantes,3.9,spa,1056,98000,2500,4/24/2004,Alfaguara
+7,title,author,8,eng,9,8,8,8/2/26,inc.
