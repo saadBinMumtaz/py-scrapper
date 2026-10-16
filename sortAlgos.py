@@ -44,3 +44,57 @@ def insertionSort(a):
             j -= 1
         a[j + 1] = key
     return a
+
+def mergeSort(a):
+    global cmp, swp
+    if len(a) <= 1:
+        return a
+    mid = len(a) // 2
+    left = mergeSort(a[:mid])
+    right = mergeSort(a[mid:])
+    result = []
+    i = 0
+    j = 0
+    while i < len(left) and j < len(right):
+        cmp += 1
+        if left[i][0] <= right[j][0]:  # <= keeps it stable
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+        swp += 1  # placement = swap
+    swp += (len(left) - i) + (len(right) - j)
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+
+def partition(a, p, r):
+    global cmp, swp
+
+    pivot = a[p][0]
+    i = p
+
+    for j in range(p + 1, r + 1):
+        cmp += 1
+
+        if a[j][0] <= pivot:
+            i += 1
+            a[i], a[j] = a[j], a[i]
+            swp += 1
+
+    a[p], a[i] = a[i], a[p]
+    swp += 1
+
+    return i
+
+
+def quickSort(a, p, r):
+    if p < r:
+        q = partition(a, p, r)
+        quickSort(a, p, q - 1)
+        quickSort(a, q + 1, r)
+
+    return a
+
+    
