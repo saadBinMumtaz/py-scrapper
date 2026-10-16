@@ -97,4 +97,65 @@ def quickSort(a, p, r):
 
     return a
 
-    
+def heapify(a, n, i):
+    global cmp, swp
+
+    largest = i
+    left = 2 * i + 1
+    right = 2 * i + 2
+
+    if left < n:
+        cmp += 1
+        if a[left][0] > a[largest][0]:
+            largest = left
+
+    if right < n:
+        cmp += 1
+        if a[right][0] > a[largest][0]:
+            largest = right
+
+    if largest != i:
+        a[i], a[largest] = a[largest], a[i]
+        swp += 1
+        heapify(a, n, largest)
+
+
+def heapSort(a):
+    global cmp, swp
+    n = len(a)
+
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(a, n, i)
+
+    for i in range(n - 1, 0, -1):
+        a[0], a[i] = a[i], a[0]
+        swp += 1
+        heapify(a, i, 0)
+
+    return a
+
+def shellSort(a):
+    global cmp, swp
+    n = len(a)
+    gap = n // 2
+
+    while gap > 0:
+        for i in range(gap, n):
+            temp = a[i]
+            j = i
+
+            while j >= gap:
+                cmp += 1
+
+                if a[j - gap][0] <= temp[0]:
+                    break
+
+                a[j] = a[j - gap]
+                swp += 1
+                j -= gap
+
+            a[j] = temp
+
+        gap //= 2
+
+    return a
