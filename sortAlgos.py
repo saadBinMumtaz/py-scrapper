@@ -159,3 +159,77 @@ def shellSort(a):
         gap //= 2
 
     return a
+
+def countingSort(arr):
+    global cmp, swp
+
+    lo = min(arr)
+    hi = max(arr)
+    count = [0] * (hi - lo + 1)
+    output = [0] * len(arr)
+
+    for x in arr:
+        count[x - lo] += 1
+
+    for i in range(1, len(count)):
+        count[i] += count[i - 1]
+
+    for x in reversed(arr):
+        count[x - lo] -= 1
+        output[count[x - lo]] = x
+        swp += 1
+
+    return output
+
+def countSortByDigit(arr, exp):
+    global cmp, swp
+
+    count = [0] * 10
+    output = [0] * len(arr)
+
+    for x in arr:
+        digit = (x // exp) % 10
+        count[digit] += 1
+
+    for i in range(1, 10):
+        count[i] += count[i - 1]
+
+    for x in reversed(arr):
+        digit = (x // exp) % 10
+        count[digit] -= 1
+        output[count[digit]] = x
+        swp += 1
+
+    return output
+
+
+def radixSort(arr):
+    global cmp, swp
+
+    exp = 1
+    biggest = max(arr)
+
+    while biggest // exp > 0:
+        arr = countSortByDigit(arr, exp)
+        exp *= 10
+
+    return arr
+
+def bucketSort(arr):
+    global cmp, swp
+
+    n = len(arr)
+    buckets = [[] for i in range(n)]
+
+    for x in arr:
+        buckets[int(n * x)].append(x)
+
+    for b in buckets:
+        insertionSort(b)
+
+    result = []
+
+    for b in buckets:
+        result.extend(b)
+
+    return result
