@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QColor
 from dataLoader import loadData
 from sortAlgos import algoNames, algoInfo, runSort, whyNot
+from worker import job, startThread
 
 state = {}
 ui = {}
@@ -73,6 +74,9 @@ def buildWindow():
 
     root = QWidget()
     root.setLayout(layout)
+    timer = QTimer()
+    timer.timeout.connect(checkJob)
+    ui["timer"] = timer
     win.setCentralWidget(root)
 
     table.horizontalHeader().sectionClicked.connect(
@@ -155,26 +159,24 @@ def sourceRows():
 
     return state["shown"]
 
-
 def doSort():
     col = ui["colBox"].currentIndex()
     name = ui["algoBox"].currentText()
-    rows = sourceRows()
+    desc = ui["descChk"].isChecked()
+    src = sourceRows()
     kind = state["kinds"][col]
-
-    why = whyNot(name, rows, col, kind)
-
-    if why:
+    why = whyNot(name, src, col, kind)
+    if why != "":
         status(name + ": " + why)
         return
 
-    result = runSort(
-        rows, col, kind, name,
-        ui["descChk"].isChecked()
-    )
+    def work(say):
+        return runSort(src, col, kind, name, desc)
 
-    sortDone(result, col)
+    def onDone(res):
+        sortDone(res, col)
 
+    startJob(work, onDone)
 
 def sortDone(result, col):
     rows, ms, comparisons, swaps = result
@@ -185,3 +187,35 @@ def sortDone(result, col):
         f"Time: {ms:.2f} ms | "
         f"Comparisons: {comparisons:,} | Swaps: {swaps:,}"
     )
+
+def allButtons():
+    out = []
+    for key in ("sortBtn", "benchBtn", "sBtn", "rBtn", "mBtn", "fBtn"):
+        if key in ui:  # skip buttons that do not exist yet
+            out.append(ui[key])
+    return out
+
+def setBusy(on):
+    if on:
+        ui["progress"].setRange(0, 0)  # busy bar
+    else:
+        ui["progress"].setRange(0, 1)
+        ui["progress"].setValue(1)
+    for b in allButtons():
+        b.setEnabled(not on)
+
+def startJob(func, onDone):
+    setBusy(True)
+    state["onDone"] = onDone
+    startThread(func)
+    ui["timer"].start(100)
+
+def checkJob():
+    if job["msg"] != "":
+        status(job["msg"])
+    if job["done"]:
+        ui["timer"].stop()
+        setBusy(False)
+        if job["result"] is not None:
+            state["onDone"](job["result"])
+
