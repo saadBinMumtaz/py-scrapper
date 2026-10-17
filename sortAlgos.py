@@ -13,7 +13,7 @@ def bubbleSort(a):
     for i in range(n):
         for j in range(n - i - 1):
             cmp += 1
-            if a[j][0] > a[j + 1][0]:
+            if a[j] > a[j + 1]:
                 a[j], a[j + 1] = a[j + 1], a[j]
                 swp += 1
     return a
@@ -25,7 +25,7 @@ def selectionSort(a):
         minIndex = i
         for j in range(i + 1, n):
             cmp += 1
-            if a[j][0] < a[minIndex][0]:
+            if a[j] < a[minIndex]:
                 minIndex = j
         if minIndex != i:
             a[i], a[minIndex] = a[minIndex], a[i]
@@ -37,7 +37,7 @@ def insertionSort(a):
     for i in range(1, len(a)):
         key = a[i]
         j = i - 1
-        while j >= 0 and a[j][0] > key[0]:
+        while j >= 0 and a[j] > key:
             cmp += 1
             a[j + 1] = a[j]  # shift = swap
             swp += 1
@@ -57,7 +57,7 @@ def mergeSort(a):
     j = 0
     while i < len(left) and j < len(right):
         cmp += 1
-        if left[i][0] <= right[j][0]:  # <= keeps it stable
+        if left[i] <= right[j]:
             result.append(left[i])
             i += 1
         else:
@@ -72,13 +72,13 @@ def mergeSort(a):
 def partition(a, p, r):
     global cmp, swp
 
-    pivot = a[p][0]
+    pivot = a[p]
     i = p
 
     for j in range(p + 1, r + 1):
         cmp += 1
 
-        if a[j][0] <= pivot:
+        if a[j] <= pivot:
             i += 1
             a[i], a[j] = a[j], a[i]
             swp += 1
@@ -106,12 +106,12 @@ def heapify(a, n, i):
 
     if left < n:
         cmp += 1
-        if a[left][0] > a[largest][0]:
+        if a[left] > a[largest]:
             largest = left
 
     if right < n:
         cmp += 1
-        if a[right][0] > a[largest][0]:
+        if a[right] > a[largest]:
             largest = right
 
     if largest != i:
@@ -147,7 +147,7 @@ def shellSort(a):
             while j >= gap:
                 cmp += 1
 
-                if a[j - gap][0] <= temp[0]:
+                if a[j - gap] <= temp:
                     break
 
                 a[j] = a[j - gap]
@@ -233,3 +233,116 @@ def bucketSort(arr):
         result.extend(b)
 
     return result
+
+
+algoNames = ["Bubble Sort", "Selection Sort", "Insertion Sort", "Merge Sort", "Quick Sort",
+             "Heap Sort", "Shell Sort", "Counting Sort", "Radix Sort", "Bucket Sort"]
+
+algoFuncs = {
+    "Bubble Sort": bubbleSort,
+    "Selection Sort": selectionSort,
+    "Insertion Sort": insertionSort,
+    "Merge Sort": mergeSort,
+    "Quick Sort": quickSort,
+    "Heap Sort": heapSort,
+    "Shell Sort": shellSort,
+    "Counting Sort": countingSort,
+    "Radix Sort": radixSort,
+    "Bucket Sort": bucketSort,
+}
+
+# complexity, stable
+algoInfo = {
+    "Bubble Sort": ["O(n²)", "Stable"],
+    "Selection Sort": ["O(n²)", "Unstable"],
+    "Insertion Sort": ["O(n²)", "Stable"],
+    "Merge Sort": ["O(n log n)", "Stable"],
+    "Quick Sort": ["O(n log n) avg, O(n²) worst", "Unstable"],
+    "Heap Sort": ["O(n log n)", "Unstable"],
+    "Shell Sort": ["O(n²) worst", "Unstable"],
+    "Counting Sort": ["O(n + k)", "Stable"],
+    "Radix Sort": ["O(d · (n + b))", "Stable"],
+    "Bucket Sort": ["O(n + k) avg, O(n²) worst", "Stable"],
+}
+
+def whyNot(name, rows, col, kind):
+    if len(rows) == 0:
+        return ""
+
+    if name == "Counting Sort" or name == "Radix Sort" or name == "Bucket Sort":
+        if kind != "num":
+            return "needs a number column"
+
+    if name == "Counting Sort" or name == "Radix Sort":
+        vals = [r[col] for r in rows]
+
+        for v in vals:
+            if v != int(v):
+                return "needs whole numbers"
+
+        if name == "Radix Sort" and min(vals) < 0:
+            return "needs numbers 0 or more"
+
+        if name == "Counting Sort" and max(vals) - min(vals) > 5000000:
+            return "value range is too big"
+
+    return ""
+
+
+def runSort(rows, col, kind, name, desc=False):
+    global cmp, swp
+
+    cmp = 0
+    swp = 0
+
+    if len(rows) == 0:
+        return [], 0, 0, 0
+
+    keys = []
+    waiting = {}
+
+    for r in rows:
+        k = makeKey(r[col], kind)
+        keys.append(k)
+
+        if k not in waiting:
+            waiting[k] = []
+
+        waiting[k].append(r)
+
+    start = time.perf_counter()
+
+    if name == "Quick Sort":
+        keys = quickSort(keys, 0, len(keys) - 1)
+    elif name == "Counting Sort":
+        keys = countingSort([int(k) for k in keys])
+    elif name == "Radix Sort":
+        keys = radixSort([int(k) for k in keys])
+    elif name == "Bucket Sort":
+        lo = min(keys)
+        span = max(keys) - lo
+        if span == 0:
+            span = 1
+        back = {}
+        scaled = []
+        for k in keys:
+            x = (k - lo) / (span * 1.000001)  # between 0 and 1, as bucketSort needs
+            scaled.append(x)
+            back[x] = k
+        keys = []
+        for x in bucketSort(scaled):
+            keys.append(back[x])
+    else:
+        keys = algoFuncs[name](keys)
+
+    ms = (time.perf_counter() - start) * 1000
+
+    if desc:
+        keys.reverse()
+
+    out = []
+
+    for k in keys:
+        out.append(waiting[k].pop(0))
+
+    return out, ms, cmp, swp
